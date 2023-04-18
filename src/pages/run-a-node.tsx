@@ -1,10 +1,10 @@
 // Libraries
-import React from "react"
+import React, { ReactNode } from "react"
 import { graphql, PageProps } from "gatsby"
 import { GatsbyImage } from "gatsby-plugin-image"
 import { useIntl } from "react-intl"
 import styled from "@emotion/styled"
-import { type Icon as ChakraIcon } from "@chakra-ui/react"
+import { Box, chakra, Text, type Icon as ChakraIcon } from "@chakra-ui/react"
 
 // Assets
 import Dappnode from "../assets/run-a-node/dappnode.svg"
@@ -22,7 +22,7 @@ import {
 } from "../components/icons/run-a-node"
 
 // Components
-import PageHero from "../components/PageHero"
+import PageHero, { IContent } from "../components/PageHero"
 import PageMetadata from "../components/PageMetadata"
 import Translation from "../components/Translation"
 import {
@@ -47,86 +47,88 @@ import { translateMessageId, TranslationKey } from "../utils/translations"
 import { scrollIntoView } from "../utils/scrollIntoView"
 import { getImage } from "../utils/image"
 
+type ChildOnlyProp = { children: ReactNode }
+
 // Styles
-const GappedPage = styled(Page)`
-  gap: 4rem;
-  @media (max-width: ${({ theme }) => theme.breakpoints.l}) {
-    gap: 3rem;
-  }
-  * {
-    scroll-margin-top: 5.5rem;
-  }
-`
 
-const GappedContent = styled(Content)`
-  display: flex;
-  flex-direction: column;
-  gap: 3rem;
-  padding: 1rem 4rem;
-  @media (max-width: ${({ theme }) => theme.breakpoints.l}) {
-    gap: 2rem;
-    padding: 1rem 2rem;
-  }
-  @media (max-width: ${({ theme }) => theme.breakpoints.m}) {
-    padding: 1rem 0;
-  }
-`
+const GappedPage = chakra(Page, {
+  baseStyle: {
+    gap: { base: 12, lg: 16 },
+    "*": {
+      scrollMarginTop: 22,
+    },
+  },
+})
 
-const HeroContainer = styled.div`
-  background: ${({ theme }) => theme.colors.runNodeGradient};
-  width: 100%;
-`
+const GappedContent = chakra(Content, {
+  baseStyle: {
+    gap: { base: 8, lg: 12 },
+    px: 4,
+    py: { base: 0, md: 8, lg: 16 },
+    display: "flex",
+    flexDir: "column",
+  },
+})
 
-const Hero = styled(PageHero)`
-  padding-bottom: 2rem;
-`
+const HeroContainer = (props: ChildOnlyProp) => {
+  return <Box background="runNodeGradient" w="100%" {...props} />
+}
 
-const TwoColumnContent = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  gap: 2rem;
-  @media (max-width: ${({ theme }) => theme.breakpoints.l}) {
-    flex-direction: column;
-    align-items: flex-start;
-    margin-left: 0rem;
-    margin-right: 0rem;
-  }
-`
+const Hero = chakra(PageHero, {
+  baseStyle: {
+    pb: 8,
+  },
+})
 
-const SplitContent = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 2rem;
+const TwoColumnContent = (props: ChildOnlyProp) => {
+  return (
+    <Box
+      display="flex"
+      justifyContent="space-between"
+      mb={8}
+      gap={8}
+      flexDirection={{ base: "column", lg: "inherit" }}
+      alignItems={{ base: "flex-start", lg: "center" }}
+      ml={{ base: 0, lg: "inherit" }}
+      mr={{ base: 0, lg: "inherit" }}
+      {...props}
+    />
+  )
+}
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.m}) {
-    width: 100%;
-    flex-direction: column-reverse;
-  }
-`
+const SplitContent = (props: ChildOnlyProp) => {
+  return (
+    <Box
+      display="flex"
+      alignItems="center"
+      gap={8}
+      flexDirection={{ base: "column-reverse", md: "inherit" }}
+      width={{ base: "100%", md: "auto" }}
+      {...props}
+    />
+  )
+}
 
-const Column = styled.div`
-  flex: 1;
-`
+const Column = (props: ChildOnlyProp) => {
+  return <Box flex={1} {...props} />
+}
 
-const ResponsiveButtonLink = styled(ButtonLink)`
-  gap: 1rem;
-  padding-left: 2rem;
-  padding-right: 2rem;
-
-  &:hover {
-    svg {
-      fill: ${({ theme }) => theme.colors.buttonColor};
-      transform: scale(1.15);
-      transition: 0.1s;
-    }
-  }
-  @media (max-width: ${({ theme }) => theme.breakpoints.s}) {
-    width: 100%;
-    justify-content: center;
-  }
-`
+const ResponsiveButtonLink = chakra(ButtonLink, {
+  baseStyle: {
+    gap: 4,
+    pl: 8,
+    pr: 8,
+    _hover: {
+      svg: {
+        fill: "buttonColor",
+        transform: "scale(1.15)",
+        transition: "0.1s",
+      },
+    },
+    width: { base: "100%", md: "auto" },
+    justifyContent: { base: "center", md: "flex-start" },
+  },
+})
 
 const Highlight = styled(Content)<{ backgroundColor: string }>`
   display: flex;
@@ -171,57 +173,122 @@ const Highlight = styled(Content)<{ backgroundColor: string }>`
     filter: blur(1rem);
   }
 `
+//TODO
+// const Highlight = chakra(Content, {
+//  baseStyle: {
+//   display: "flex",
+//   justifyContent: "center",
+//   alignItems: "center",
+//   // background: "backgroundColor",
+//   border: "1px solid #dadada",
+//   boxSizing: "border-box",
+//   borderRadius: "4px",
+//   padding: "2rem 6rem",
+//   color: "text",
+//   position: "relative",
+//   isolation: "isolate",
+//   "@media (max-width: 48em)": {
+//     padding: "2rem",
+//     flexDirection: "column-reverse",
+//     "&:nth-of-type(even)": {
+//       flexDirection: "column-reverse",
+//       "& svg": {
+//         margin: "0 0 2rem",
+//       },
+//     },
+//     "& svg": {
+//       margin: "0 0 2rem",
+//     },
+//   },
+//   "&::after": {
+//     content: '""',
+//     position: "absolute",
+//     inset: 0,
+//     zIndex: -1,
+//     background: "inherit",
+//     filter: "blur(1rem)",
+//   },
+//   svg: {
+//     ml: 8,
+//   },
+//   _even: {
+//     flexDirection: "row-reverse",
+//     svg: {
+//       ml: 0,
+//       mr: 8,
+//     },
+//   },
 
-const SoftwareHighlight = styled(Highlight)``
+//  }
 
-const ColumnFill = styled.div`
-  line-height: 2;
-  box-sizing: border-box;
-  flex: 1;
-  ul {
-    list-style: none;
-  }
-  @media (max-width: ${({ theme }) => theme.breakpoints.m}) {
-    width: 100%;
-  }
-`
+// })
 
-const ColumnNarrow = styled.div`
-  box-sizing: border-box;
-  display: flex;
-  inset: auto;
-  justify-content: center;
-  align-items: center;
-  @media (max-width: ${({ theme }) => theme.breakpoints.m}) {
-    width: 100%;
-  }
-`
+const SoftwareHighlight = chakra(Highlight)
 
-const FlexContent = styled(Content)`
-  display: flex;
-  flex-direction: column;
-`
+const ColumnFill = (props: ChildOnlyProp) => {
+  return (
+    <Box
+      lineHeight={2}
+      boxSizing="border-box"
+      flex={1}
+      width={{ base: "100%", md: "auto" }}
+      listStyleType="none"
+      {...props}
+    />
+  )
+}
 
-const Flex = styled.div`
-  display: flex;
-  gap: 2rem;
-  @media (max-width: ${({ theme }) => theme.breakpoints.l}) {
-    flex-direction: column;
-  }
-`
+const ColumnNarrow = (props: ChildOnlyProp) => {
+  return (
+    <Box
+      boxSizing="border-box"
+      justifyContent="center"
+      alignItems="center"
+      inset="auto"
+      width={{ base: "100%", md: "auto" }}
+      {...props}
+    />
+  )
+}
 
-const MarginFlex = styled(Flex)`
-  margin: 3rem 0;
-`
+const FlexContent = chakra(Content, {
+  baseStyle: {
+    display: "flex",
+    flexDirection: "column",
+  },
+})
 
-const Container = styled.div`
-  background: ${({ theme }) => theme.colors.grayBackground};
-  border: 1px solid #d1d1d1;
-  box-sizing: border-box;
-  border-radius: 5px;
-  color: ${({ theme }) => theme.colors.text};
-  padding: 0 2rem;
-`
+const Flex = (props: ChildOnlyProp) => {
+  return (
+    <Box
+      display="flex"
+      gap={8}
+      flexDirection={{ base: "column", lg: "inherit" }}
+      {...props}
+    />
+  )
+}
+
+const MarginFlex = chakra(Flex, {
+  baseStyle: {
+    marginX: 8,
+  },
+})
+
+const Container = (props: ChildOnlyProp) => {
+  return (
+    <Box
+      background="grayBackground"
+      border="1px solid #d1d1d1"
+      boxSizing="border-box"
+      borderRadius="5px"
+      color="text"
+      paddingX={8}
+      paddingY={0}
+      {...props}
+    />
+  )
+}
 
 const BuildBox = styled(Container)`
   background: ${({ theme }) => theme.colors.preBackground};
@@ -236,96 +303,125 @@ const BuildBox = styled(Container)`
   }
 `
 
-const BuildBoxSpace = styled(BuildBox)`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  &:hover {
-    transform: scale(1.02);
-    transition: transform 0.1s;
-  }
-`
+//TODO
+// const BuildBox = chakra(Container, {
+//   baseStyle: {
+//     background: "preBackground",
+//     flex: 1,
+//     padding: 8,
+//     flexDirection: { base: "column", md: "row" },
+//     "& > p:last-of-type": {
+//       marginBottom: 8,
+//     },
+//   },
+// })
 
-const FullyLoaded = styled(Container)`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  line-height: 200%;
-  padding: 2rem;
-  flex: 1;
-  p {
-    font-size: 110%;
-  }
-  code {
-    font-weight: 600;
-    line-height: 125%;
-  }
-  @media (max-width: ${({ theme }) => theme.breakpoints.l}) {
-    button {
-      width: fit-content;
-      padding-left: 2rem;
-      padding-right: 2rem;
-    }
-  }
-  @media (max-width: ${({ theme }) => theme.breakpoints.s}) {
-    button {
-      width: 100%;
-    }
-  }
-  &:hover {
-    transition: transform 0.1s;
-    transform: scale(1.02);
-  }
-`
+const BuildBoxSpace = chakra(BuildBox, {
+  baseStyle: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    _hover: {
+      transform: "scale(1.02)",
+      transition: "transform 0.1s",
+    },
+  },
+})
 
-const SvgTitle = styled.div`
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-`
+const FullyLoaded = (props: ChildOnlyProp) => {
+  return (
+    <Box
+      as={Container}
+      display="flex"
+      flexDirection="column"
+      justifyContent="space-between"
+      lineHeight="200%"
+      padding={8}
+      flex={1}
+      sx={{
+        p: {
+          fontSize: "110%",
+        },
+        code: {
+          fontWeight: 600,
+          lineHeight: "125%",
+        },
+        button: {
+          width: { base: "100%", sm: "fit-content", lg: "inherit" },
+          paddingLeft: { base: 8, lg: "inherit" },
+          paddingRight: { base: 8, lg: "inherit" },
+        },
+      }}
+      _hover={{
+        transform: "scale(1.02)",
+        transition: "transform 0.1s",
+      }}
+      {...props}
+    />
+  )
+}
 
-const ButtonContainer = styled.div`
-  display: flex;
-  gap: 1rem;
-  margin-top: auto;
-  @media (max-width: ${({ theme }) => theme.breakpoints.l}) {
-    flex-direction: column;
-  }
-`
+const SvgTitle = (props: ChildOnlyProp) => {
+  return <Box display="flex" gap={4} alignItems="center" {...props} />
+}
 
-const DappNodeButtonLink = styled(ResponsiveButtonLink)`
-  background-color: #187d76;
-  span {
-    color: ${({ theme }) => theme.colors.white};
-  }
-  &:hover {
-    background-color: #0f5f5f;
-    box-shadow: 4px 4px 0 0 rgba(#187d76, 0.47);
-  }
-`
+const ButtonContainer = (props: ChildOnlyProp) => {
+  return (
+    <Box
+      display="flex"
+      gap={4}
+      flexDirection={{ base: "column", lg: "row" }}
+      mt="auto"
+      {...props}
+    />
+  )
+}
 
-const AvadoButtonLink = styled(ResponsiveButtonLink)`
-  background-color: #37822e;
-  span {
-    color: ${({ theme }) => theme.colors.white};
-  }
-  &:hover {
-    background-color: #2e6d2e;
-    box-shadow: 4px 4px 0 0 rgba(#37822e, 0.47);
-  }
-`
+const DappNodeButtonLink = chakra(ResponsiveButtonLink, {
+  baseStyle: {
+    background: "#187d76",
+    span: {
+      color: "white",
+    },
+    _hover: {
+      background: "#0f5f5f",
+      boxShadow: "4px 4px 0 0 rgba(#187d76, 0.47)",
+    },
+  },
+})
+
+const AvadoButtonLink = chakra(ResponsiveButtonLink, {
+  baseStyle: {
+    background: "#37822e",
+    span: {
+      color: "white",
+    },
+    _hover: {
+      background: "#2e6d2e",
+      boxShadow: "4px 4px 0 0 rgba(#37822e, 0.47)",
+    },
+  },
+})
 
 const StyledEmoji = styled(Emoji)`
   margin-right: 1rem;
 `
 
-const ScrollLink = styled(NakedButton)`
-  text-align: start;
-  color: ${({ theme }) => theme.colors.primary};
-  &.active {
-    color: ${({ theme }) => theme.colors.primary};
-  }
-`
+// const StyledEmoji = chakra(Emoji, {
+//   baseStyle: {
+//     marginRight: 4
+//   },
+// })
+
+const ScrollLink = chakra(NakedButton, {
+  baseStyle: {
+    textAlign: "start",
+    color: "primary",
+    _active: {
+      color: "primary",
+    },
+  },
+})
 
 const BuildContainer = styled(Container)`
   flex: 1;
@@ -338,53 +434,51 @@ const BuildContainer = styled(Container)`
   }
 `
 
-const ScrollButtonSecondary = styled.button`
-  text-decoration: none;
-  display: inline-block;
-  padding: 0.5rem 2rem;
-  margin-top: 1rem;
-  font-size: 1rem;
-  border-radius: 0.25em;
-  text-align: center;
-  cursor: pointer;
+const ScrollButtonSecondary = chakra("button", {
+  baseStyle: {
+    textDecoration: "none",
+    display: "inline-block",
+    paddingY: 2,
+    paddingX: 8,
+    marginTop: 4,
+    fontSize: "md",
+    borderRadius: 1,
+    textAlign: "center",
+    cursor: "pointer",
+    color: "text",
+    border: "1px solid",
+    borderColor: "text",
+    backgroundColor: "transparent",
+    _hover: {
+      color: "primary",
+      borderColor: "primary",
+      boxShadow: "cardBoxShadow",
+      transform: "scale(1.05)",
+      transition: "0.1s",
+      fill: "buttonColor",
+    },
+    _active: {
+      backgroundColor: "secondaryButtonBackgroundActive",
+    },
+  },
+})
 
-  color: ${({ theme }) => theme.colors.text};
-  border: 1px solid ${({ theme }) => theme.colors.text};
-  background-color: transparent;
-  &:hover {
-    color: ${({ theme }) => theme.colors.primary};
-    border: 1px solid ${({ theme }) => theme.colors.primary};
-    box-shadow: ${({ theme }) => theme.colors.cardBoxShadow};
-  }
-  &:active {
-    background-color: ${({ theme }) =>
-      theme.colors.secondaryButtonBackgroundActive};
-  }
-  &:hover {
-    transition: transform 0.1s;
-    transform: scale(1.05);
-  }
-`
+const DiscordIcon = chakra(Icon, {
+  baseStyle: {
+    fill: "buttonColor",
+  },
+})
 
-const DiscordIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.colors.buttonColor};
-`
-
-const StakingCalloutContainer = styled(SplitContent)`
-  background: linear-gradient(
-    262.78deg,
-    rgba(152, 186, 249, 0.25) 0%,
-    rgba(207, 177, 251, 0.25) 53.12%,
-    rgba(151, 252, 246, 0.25) 100%
-  );
-  width: 100%;
-  padding: 2rem;
-  gap: 5rem;
-  @media (max-width: ${({ theme }) => theme.breakpoints.m}) {
-    flex-direction: column;
-    gap: 3rem;
-  }
-`
+const StakingCalloutContainer = chakra(SplitContent, {
+  baseStyle: {
+    background:
+      "linear-gradient(262.78deg, rgba(152, 186, 249, 0.25) 0%, rgba(207, 177, 251, 0.25) 53.12%, rgba(151, 252, 246, 0.25) 100%)",
+    width: "100%",
+    padding: 8,
+    flexDirection: { base: "column", md: "row" },
+    gap: { base: 12, md: 20 },
+  },
+})
 
 const Leslie = styled(GatsbyImage)`
   transform: scaleX(-1) scale(1.15) translateX(2rem);
@@ -392,11 +486,23 @@ const Leslie = styled(GatsbyImage)`
     transform: scaleX(-1) translateY(-3rem);
   }
 `
+//TODO
+// const Leslie = chakra(GatsbyImage, {
+//   baseStyle: {
+//     transform: {
+//       base: `scaleX(-1) scale(1.15) translateX(${8})`,
+//       lg: `scaleX(-1) translateY(${-12})`,
 
-const StrongParagraph = styled.p`
-  font-size: 150%;
-  font-weight: 600;
-`
+//     },
+//   },
+// })
+
+const StrongParagraph = chakra("p", {
+  baseStyle: {
+    fontSize: "150%",
+    fontWeight: 600,
+  },
+})
 
 interface RunANodeCard {
   image: typeof ChakraIcon
